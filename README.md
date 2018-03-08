@@ -14,6 +14,8 @@ npm start to lauch the app
 Create user and find the token
 POST localhost:1407/user/create
 ----------
+Header is  'X-Auth' = User token
+
 To Dispaly the list of user and other details 
 GET localhost:1407/user
 ----------
