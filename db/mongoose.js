@@ -6,11 +6,11 @@ mongoose.Promise = global.Promise;
 import dotEnv from 'dotenv'
 dotEnv.config();
 
-let url = 'mongodb://localhost:' +process.env.MONGOSERVERPORT+'/login_system';
+let url = 'mongodb://localhost:' + process.env.MONGOSERVERPORT + '/login_system';
 
 let db = mongoose.connect(url, {}, (err) => {
     if (err) { throw err; } else {
-        console.log('Mongodb connected on port:'+ process.env.MONGOSERVERPORT);
+        console.log('Mongodb connected on port:' + process.env.MONGOSERVERPORT);
     }
 });
 

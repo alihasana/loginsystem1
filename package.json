@@ -1,12 +1,12 @@
 {
-  "name": "loginsystem1",
+  "name": "userloginsytem",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon index.js"
   },
-  "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
@@ -14,11 +14,14 @@
     "body-parser": "^1.18.2",
     "dotenv": "^5.0.1",
     "express": "^4.16.2",
-    "jsonwebtoken": "^8.2.0",
-    "moment": "^2.21.0",
-    "mongodb": "^3.0.4",
-    "mongoose": "^5.0.9",
-    "mongoose-type-email": "^1.0.5",
-    "morgan": "^1.9.0"
+    "jsonwebtoken": "^8.1.1",
+    "moment": "^2.20.1",
+    "mongodb": "^3.0.3",
+    "mongoose": "^5.0.7",
+    "mongoose-type-email": "^1.0.5"
+  },
+  "devDependencies": {
+    "babel-preset-es2015": "^6.24.1",
+    "babel-register": "^6.26.0"
   }
 }

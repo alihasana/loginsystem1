@@ -3,6 +3,9 @@ import 'mongoose-type-email'
 import bcrypt from 'bcrypt'
 import moment from 'moment'
 import jwt from 'jsonwebtoken'
+import dotEnv from 'dotenv'
+
+dotEnv.config();
 
 let UserSchema = new mongoose.Schema({
     ID:{
@@ -12,11 +15,10 @@ let UserSchema = new mongoose.Schema({
         default: parseInt(moment(new Date()).format('mmssSSS'))
     },
     email:{
-        type: mongoose.SchemaTypes.Email,
-        unique: true,
+        type: String,
         trim: true,
         required: true,
-        lowercase: true
+        unique: true
     },
     password:{
         type: String,
@@ -32,14 +34,14 @@ let UserSchema = new mongoose.Schema({
     }
 })
 
-User.methods.GenerateJWTToken = function(callback){
+UserSchema.methods.GenerateJWTToken = function(callback){
     bcrypt.hash(this.password,10,(err, hashed_pw)=>{
         this.password = hashed_pw;
         this.save()
         .then(result => {
             console.log(result);
             callback({status: 'Success',
-                    token: jwt.sign({email: this.email, password: this.password},'abc123')
+                token: jwt.sign({ email: this.email, password: this.password }, process.env.SECRETKEY)
                     });
         })
         .catch(err => {
@@ -52,11 +54,12 @@ User.methods.GenerateJWTToken = function(callback){
 UserSchema.statics.verifyJWTToken = function(token){
     let decoded;
     try{
-        decoded = jwt.verify(token, 'abc123');
+        decoded = jwt.verify(token, process.env.SECRETKEY);
         return Promise.resolve(decoded);
     }catch(error){
         return Promise.reject(error);
     }
 }
 
-export default mongoose.model('User', UserSchema);
+let User = mongoose.model('User', UserSchema);
+module.exports = User;

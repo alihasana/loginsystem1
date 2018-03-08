@@ -2,32 +2,36 @@
 import express from 'express'
 import bodyParser from 'body-parser'
 import jwt from 'jsonwebtoken'
-import morgan from 'morgan'
 import dotEnv from 'dotenv'
 import mongoose from 'mongoose'
 import bcrypt from 'bcrypt'
-
-//  Routes imports
-import Users from './models/users'
 import db from './db/mongoose'
+import User from './models/users'
+
+// Init .env
+dotEnv.config();
+
+// APP INIT
+let app = express();
 
 
+// CORS
+app.use(function (req, res, next) {
+    res.header(`Access-Control-Allow-Origin`, `*`);
+    res.header(`Access-Control-Allow-Methods`, `GET,PUT,POST,DELETE`);
+    res.header(`Access-Control-Allow-Headers`, `Content-Type`);
+    next();
+});
 
-var app = express();
-
-const PORT = process.env.PORT||3000;
-
-// var john = new Customer(
-//     firstname: 'John',
-//     lastname: 'Doe',
-//     email: 'john.doe@example.com',
-//     phone:'1234567890',
-//     address: '10 Main Street Columbus Ohio'
-// });
+// BODY PARSER
+app.use(bodyParser.urlencoded({
+    extended: true
+}));
 app.use(bodyParser.json());
-app.post('/customer/create',(req,res)=>{
-    var customer = new Customer(req.body);
-    customer.GenerateJWTToken((result)=>{
+
+app.post('/user/create',(req,res)=>{
+    let users = new User(req.body);
+    users.GenerateJWTToken((result)=>{
         if(result.status == 'Success'){
             res.json(result);
         }else{
@@ -38,37 +42,41 @@ app.post('/customer/create',(req,res)=>{
     //res.status(200).send('all ok');
 })
 
-app.get('/customers',(req,res)=>{
-    Customer.verifyJWTToken(req.header('X-Auth'))
+app.get('/user',(req,res)=>{
+    User.verifyJWTToken(req.header('X-Auth'))
     .then(result =>{
-        return Customer.find({});
+        return User.find({});
     })
     .then(result => res.status(200).send(result))
     .catch(err => res.status(400).send(err))
     });
-    
 
-app.get('/customer/:id',(req,res)=>{
-    Customer.verifyJWTToken(req.header('X-Auth'))
+app.get('/user/message', (req, res) => {
+    User.verifyJWTToken(req.header('X-Auth'))
+        .then(decodedToken => {
+            console.log('decodedToken')
+            User.findOne({ "email": decodedToken.email }, { message: 1 }, function(err, usersMessages) {
+                console.log('here is messqge', usersMessages);
+            });
+            
+        })
+
+        .then (result => res.status(200).json({success: true, content: result}))
+        .catch(err => res.status(400).send(err));
+});
+
+app.get('/user/:id',(req,res)=>{
+    User.verifyJWTToken(req.header('X-Auth'))
     .then(result =>{
-        return Customer.findOne({"ID":req.params.id});
+        return User.findOne({"ID":req.params.id});
     })
     
     .then(result => res.status(200).send(result))
     .catch(err => res.status(400).send(err));
 });
 
-app.patch('/customer/:id',(req,res)=>{
-    req.body.update_timestamp = Date.now();
-    Customer.verifyJWTToken(req.header('X-Auth'))
-    .then(result =>{
-        return Customer.findOneAndUpdate({"ID":req.params.id},req.body);
-    })
-    
-    .then(result => res.status(200).send(result))
-    .catch(err => res.status(400).send(err));
-})
 
-app.listen(PORT,()=>{
-    console.log('Express listening on port:',PORT);
-})
+
+
+let port = process.env.PORT || 8080;
+app.listen(port, () => console.log('App listen on port: ' + port));
